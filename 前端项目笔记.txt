@@ -1,0 +1,35 @@
+前后端的连载
+
+	1.下载 cnpm install concurrently -D
+
+	2.前端package.json的配置
+
+  		"scripts": {
+    				"serve": "vue-cli-service serve",
+    				"build": "vue-cli-service build",
+    				"start": "npm run serve"
+  			   },
+	3.后端package.json的配置
+
+  		"scripts": {
+    			    	"client-install": "npm install --prefix client",
+    				"client": "npm start --prefix client",
+    				"start": "node server.js",
+    				"server": "nodemon server.js",
+    				"dev": "concurrently \"npm run server\" \"npm run client\""
+  			   },
+
+	4.启动 npm run dev
+
+--------------------------------------------------------------------------
+//全局守卫的配置
+router.beforeEach((to,from,next) => {
+  const token = localStorage.getItem('eleToken') ? true : false;
+  if(to.path == '/login' || to.path == '/register'){
+    next()
+  }else{
+    token ? next() : next('/login')
+  }
+})
+
+--------------------------------------------------------------------------

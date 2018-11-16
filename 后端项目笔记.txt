@@ -1,0 +1,201 @@
+express框架的基本使用
+
+1.cnpm install express -S //下载
+
+const express = require('express'); //引入
+
+const app = express(); //实例化一个app
+
+const port = process.env.PORT || 8888 //设置端口为环境变量的端口或者8888
+
+app.get('/',(req,res) => { //发送一条消息
+    res.send('hello world');
+})
+
+app.listen(port,() => { //监听端口是否开启
+    console.log(`Server is running in ${port}`)
+})
+
+
+--------------------------------------------------------------------------
+mongodb数据库的连接
+
+1.cnpm install mongoose //下载连接数据库的模块
+
+2.mongoose.connect('localhost//test') //连接
+
+--------------------------------------------------------------------------
+
+mongoose Shema图形的创建
+
+const mongoose = require('mongoose'); //使用mongoose
+
+const Schema = mongoose.Schema;  //实例化出来Schema
+
+const userSchema = new Schema({}) //定义架构
+
+const User = mongoose.model('user',userSchema) //创建模型
+
+module.exports = User; //导出
+
+详细:https://mongoosejs.com/docs/guide.html
+--------------------------------------------------------------------------
+路由的使用
+
+const express = require('express');
+const app = express(); 
+const router = express.Router(); //使用路由
+
+详细: http://www.expressjs.com.cn/4x/api.html#router.use
+
+--------------------------------------------------------------------------
+body-parser 作用是对post请求的请求体进行解析。
+
+是非常常用的一个express中间件，使用非常简单，以下两行代码已经覆盖了大部分的使用场景。
+
+	1.下载 cnpm install body-parser
+
+	2. const bodyParser = require('body-parser');
+
+	3.使用
+		app.use(bodyParser.json());
+		app.use(bodyParser.urlencoded({ extended: false }));
+
+详细：https://www.npmjs.com/package/body-parser
+
+--------------------------------------------------------------------------
+bcrypt 是一个跨平台的密码加密工具  用于涉及加密的接口
+
+	1.下载 cnpm install bcrypt
+
+	2.const bcrypt = require('bcrypt');
+
+	3.加密使用(register):
+
+	      bcrypt.genSalt(密码强度(10), (err, salt) => {
+                    bcrypt.hash(密码(newUser.password), salt, (err, hash) =>{
+                       if(err) throw err;
+                        
+                       newUser.password = hash; //赋值
+
+                        newUser.save()
+                            .then(res => res.json()) //保存
+                            .catch(err => console.log(err))
+                    });
+                });
+
+	4.解密使用(login):
+
+		bcrypt.compare(前台输入的密码, 数据库的密码, function(err, res) {
+   			 // res == true
+		});
+
+
+详细：https://www.npmjs.com/package/bcrypt
+
+--------------------------------------------------------------------------
+gavatar 全球公认的头像使用
+
+	1.下载 cnpm install gravatar
+	
+	2.const gravatar = require('gravatar');
+
+	3.const avatar = gravatar.url(req.body.email, {s: '200', r: 'pg', d: 'mm'});
+
+详细: https://www.npmjs.com/package/gravatar'
+
+--------------------------------------------------------------------------
+JSON Web Token（缩写 JWT）是目前最流行的跨域认证解决方案 生成token
+	       用于登录接口
+ 
+	1.下载 cnpm install jsonwebtoken
+	
+	2.const jwt = require('jsonwebtoken');
+
+	3.使用: jwt.sign(规则,加密名称,过期时间,箭头函数) //sign好比签名
+	
+	        jwt.sign(rule,'sercret',{ expiresIn: 3600 },(err,token) => {
+			res.json({
+                           success : true,
+                           token : 'Bearer' + token,
+                        })
+                  })
+
+Bearer代表token的头部 规定的格式
+
+详细:https://www.npmjs.com/package/jsonwebtoken
+
+--------------------------------------------------------------------------
+passport 是Node下的权限认证框架 用于验证jsonwebtoken的登录页面 是否有token
+
+	1.cnpm install passport passport-jwt
+
+server.js里面的配置
+
+	const passport = require("passport"); //引入passport插件
+	
+	app.use(passport.initialize());     //passport初始化
+
+	require("./config/passport")(passport);
+
+passport配置
+
+	……
+
+详细：https://blog.csdn.net/djjj123456789/article/details/81980587
+
+jwt详细配置 : https://www.npmjs.com/package/passport-jwt
+
+--------------------------------------------------------------------------
+解析token
+
+	1.下载 cnpm install jwt-decode -D
+	
+	2.import jwt_decode from 'jwt-decode'
+
+	3.const newToken = jwt_decode(token);
+--------------------------------------------------------------------------
+查找所有的数据
+
+    Profile.find()
+        .then(user => {
+            if (!user) {
+                res.status(404).json('没有任何数据')
+            } else {
+                res.json(user)
+            }
+        })
+
+--------------------------------------------------------------------------
+查找单条数据
+ Profile.findById(req.params.id) 或者 ({_id : req.params.id}) 都可以
+        .then(user => {
+            if (!user) {
+                res.status(404).json('没有找到该用户')
+            } else {
+                res.json(user)
+            }
+        })
+
+--------------------------------------------------------------------------
+编辑单条数据
+
+Profile.findOneAndUpdate({_id :req.params.id},{$set : profileObj}, {'new' : true})
+        .then(user => {
+            if(!user){
+                res.status(404).json('没有找到该用户')
+            }else{
+                res.json(user)
+            }
+        })
+
+--------------------------------------------------------------------------
+删除单条数据
+  Profile.findByIdAndRemove({_id : req.params.id})
+        .then(user => {
+            if(!user){
+                res.status(404).json('没有找到该用户')
+            }else{
+                res.json(user)
+            }
+        })
